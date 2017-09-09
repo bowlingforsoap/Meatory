@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour {
 	public static GameObject[] activeGuesses = {null, null};
+	private static int guessCount = 0;
 
 	// References
 	public GameObject guess; // First guess
@@ -61,6 +62,33 @@ public class BoardController : MonoBehaviour {
 		
 	}
 
-	public static void UpdateBoard() {
+	public static void ActivateGuess(GameObject guess) {
+		if (guessCount >= 2) {
+			// Flip the previous active
+			activeGuesses [0].GetComponent<ManageTilesController> ().Flip(true);
+			activeGuesses [1].GetComponent<ManageTilesController> ().Flip(true);
+			activeGuesses [0] = null;
+			activeGuesses [1] = null;
+			guessCount = 0;
+		}
+		activeGuesses [guessCount++] = guess; 	
+
+		Debug.Log ("Active guess count: " + guessCount);
+		Debug.Log("Guesses: " + activeGuesses[0] + ", " + activeGuesses[1]);
 	}
+
+	public static void DiactivateGuess(GameObject guess) {
+		if (activeGuesses [0] != null && activeGuesses [0].name == guess.name) {
+			activeGuesses [0] = activeGuesses [1];
+			activeGuesses [1] = null;
+			guessCount--;
+		} else if (activeGuesses [1] != null && activeGuesses [1].name == guess.name) {
+			activeGuesses [1] = null;
+			guessCount--;
+		}
+
+		Debug.Log ("Active guess count: " + guessCount);
+		Debug.Log("Guesses: " + activeGuesses[0] + ", " + activeGuesses[1]);
+	}
+		
 }
