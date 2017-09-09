@@ -12,12 +12,21 @@ public class BoardController : MonoBehaviour {
 	public int rows;
 	public int cols;
 
+	private Sprite[] sprites; // All sprites in resources folder
+
 	void Start() {
 		Transform guessTransform;
 		Transform rightGuessTransform;
 		Transform bottomGuessTransform;
 		Vector3 positionDiffRight;
 		Vector3 positionDiffBottom;
+
+		// Load 
+		sprites = Resources.LoadAll<Sprite>("");
+		foreach (var t in sprites)
+		{
+			Debug.Log(t.name);
+		}
 
 		guessTransform = guess.transform;
 		rightGuessTransform = rightGuess.transform;
@@ -29,9 +38,22 @@ public class BoardController : MonoBehaviour {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				GameObject newGuess;
+				Transform frontTransform;
+				GameObject front;
+				SpriteRenderer spriteRenderer; // newGuesse's SpriteRenderer
+
+				// Displace
 				newGuess = Object.Instantiate (guess);
 				newGuess.transform.position += i * positionDiffBottom + j * positionDiffRight;
 				newGuess.transform.SetParent (gameObject.transform);
+
+				// Set a different sprite image
+				frontTransform = newGuess.transform.GetChild(0);
+				front = frontTransform.gameObject;
+				spriteRenderer = front.GetComponent<SpriteRenderer>();
+				spriteRenderer.sprite = sprites [Random.Range (0, sprites.Length)];
+				newGuess.name = spriteRenderer.sprite.name;
+
 				newGuess.SetActive (true);
 			}
 		}

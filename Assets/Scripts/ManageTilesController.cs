@@ -7,6 +7,8 @@ public class ManageTilesController : MonoBehaviour {
 	public GameObject back;
 
 	public void Manage(string name) {
+		Debug.Log (gameObject.name + "#Manage");
+
 		Vector3 frontPosition = front.transform.position;
 		Vector3 backPosition = back.transform.position;
 
