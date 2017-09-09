@@ -3,19 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BoardController : MonoBehaviour {
-	public static GameObject[] activeGuesses = {null, null};
-	private static int guessCount = 0;
-
 	// References
 	public GameObject guess; // First guess
 	public GameObject rightGuess; // Guess on the left
 	public GameObject bottomGuess; // Guess on the bottom
 	public int rows;
 	public int cols;
-
 	private Sprite[] sprites; // All sprites in resources folder
 
+	public Transform m_leftWin; // Position of where to place the left win
+	public Transform m_middleWin; // .. the middle win
+	public Transform m_rightWin; // .. the right win
+
+	public static Transform leftWin; // Position of where to place the left win
+	public static Transform middleWin; // .. the middle win
+	public static Transform rightWin; // .. the right win
+
+	private static GameObject[] activeGuesses = {null, null};
+	private static int guessCount = 0;
+	private static GameObject[] wins = { null, null, null };
+	private static int winCount = 0;
+	private static BoardController self;
+
 	void Start() {
+		self = this;
+		leftWin = m_leftWin;
+		middleWin = m_middleWin;
+		rightWin = m_rightWin;
+
 		Transform guessTransform;
 		Transform rightGuessTransform;
 		Transform bottomGuessTransform;
@@ -64,9 +79,32 @@ public class BoardController : MonoBehaviour {
 
 	public static void ActivateGuess(GameObject guess) {
 		if (guessCount >= 2) {
-			// Flip the previous active
-			activeGuesses [0].GetComponent<ManageTilesController> ().Flip(true);
-			activeGuesses [1].GetComponent<ManageTilesController> ().Flip(true);
+			// Check if previous active are the same
+			if (activeGuesses [0] != null && activeGuesses [1] != null && activeGuesses [0].name != null && activeGuesses [0].name.Equals (activeGuesses [1].name)) {
+				GameObject win = Object.Instantiate (activeGuesses [0]);
+				win.transform.SetParent (self.gameObject.transform);
+				switch (winCount) {
+				case 0:
+					win.transform.position = leftWin.position;
+					break;
+				case 1:
+					win.transform.position = middleWin.position;
+					break;
+				case 2:
+					win.transform.position = rightWin.position;
+					break;
+				}
+
+				activeGuesses [0].SetActive (false);
+				activeGuesses [1].SetActive (false);
+
+				wins [winCount++] = win;
+			} else {
+
+				// Flip the previous active
+				activeGuesses [0].GetComponent<ManageTilesController> ().Flip (true);
+				activeGuesses [1].GetComponent<ManageTilesController> ().Flip (true);
+			}
 			activeGuesses [0] = null;
 			activeGuesses [1] = null;
 			guessCount = 0;
